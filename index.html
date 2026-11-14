@@ -6,24 +6,7 @@
 <meta name="theme-color" content="#071b27">
 <meta name="description" content="Gautam Education Official community. Learn, trade and grow.">
 <title>Gautam Education | Official</title>
-<!-- Meta Pixel is initialized once in the page controller below to avoid duplicate PageView events. -->
-<!-- Meta Pixel Code -->
-<script>
-!function(f,b,e,v,n,t,s)
-{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-n.queue=[];t=b.createElement(e);t.async=!0;
-t.src=v;s=b.getElementsByTagName(e)[0];
-s.parentNode.insertBefore(t,s)}(window, document,'script',
-'https://connect.facebook.net/en_US/fbevents.js');
-fbq('init', '1374110214636880');
-fbq('track', 'PageView');
-</script>
-<noscript><img height="1" width="1" style="display:none"
-src="https://www.facebook.com/tr?id=1374110214636880&ev=PageView&noscript=1"
-/></noscript>
-<!-- End Meta Pixel Code -->
+<!-- Meta Pixel is initialized once in the page controller below. -->
 <style>
 :root{--bg:#071b27;--panel:#0c202d;--cyan:#09d8eb;--cyan2:#12c9e3;--white:#f8fbff;--muted:#c4d0dc;--gold:#ffcf32;--line:#263449}
 *{box-sizing:border-box}
@@ -115,12 +98,12 @@ footer{margin:0 -20px;padding:28px 18px 32px;text-align:center;background:#03081
 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21.7 4.3 18.6 19c-.2 1-1 1.2-1.8.7l-5-3.7-2.4 2.3c-.3.3-.5.5-1 .5l.4-5.1 9.3-8.4c.4-.4-.1-.6-.6-.2L6 12.4l-4.9-1.5c-1.1-.3-1.1-1.1.2-1.6L20.4 2.7c.9-.3 1.7.2 1.3 1.6Z"/></svg>
 </a>
 <script>
-/* Stock Learner / Manraj: per-visitor Telegram invite + Meta attribution. */
+/* Stock Learner / Rajkumar: per-visitor Telegram invite + Meta attribution. */
 (() => {
   const TELEGRAM_CHANNEL_LINK = "https://t.me/+bZEVCEXVvmgyNDg9";
   const META_PIXEL_ID = "1374110214636880";
   const TRACKING_API = "https://multiplyadstracking.vercel.app";
-  const CLIENT_SLUG = "manraj";
+  const CLIENT_SLUG = "rajkumar";
   document.getElementById("year").textContent = new Date().getFullYear();
 
   if (/^\d+$/.test(META_PIXEL_ID)) {
@@ -173,7 +156,7 @@ footer{margin:0 -20px;padding:28px 18px 32px;text-align:center;background:#03081
         if (newTab && !newTab.closed) newTab.location.replace(data.invite_url);
         else window.location.assign(data.invite_url);
       } catch (error) {
-        console.error("Manraj Telegram tracking fallback:", error);
+        console.error("Rajkumar Telegram tracking fallback:", error);
         if (newTab && !newTab.closed) newTab.location.replace(TELEGRAM_CHANNEL_LINK);
         else window.location.assign(TELEGRAM_CHANNEL_LINK);
       } finally {
