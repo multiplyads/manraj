@@ -7,23 +7,9 @@
 <meta name="description" content="Gautam Education Official community. Learn, trade and grow.">
 <title>Gautam Education | Official</title>
 <!-- Meta Pixel is initialized once in the page controller below. -->
-<!-- Meta Pixel Code -->
-<script>
-!function(f,b,e,v,n,t,s)
-{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-n.queue=[];t=b.createElement(e);t.async=!0;
-t.src=v;s=b.getElementsByTagName(e)[0];
-s.parentNode.insertBefore(t,s)}(window, document,'script',
-'https://connect.facebook.net/en_US/fbevents.js');
-fbq('init', '1374110214636880');
-fbq('track', 'PageView');
-</script>
 <noscript><img height="1" width="1" style="display:none"
-src="https://www.facebook.com/tr?id=1374110214636880&ev=PageView&noscript=1"
+src="https://www.facebook.com/tr?id=1760555925443793&ev=PageView&noscript=1"
 /></noscript>
-<!-- End Meta Pixel Code -->
 <style>
 :root{--bg:#071b27;--panel:#0c202d;--cyan:#09d8eb;--cyan2:#12c9e3;--white:#f8fbff;--muted:#c4d0dc;--gold:#ffcf32;--line:#263449}
 *{box-sizing:border-box}
@@ -118,7 +104,7 @@ footer{margin:0 -20px;padding:28px 18px 32px;text-align:center;background:#03081
 /* Stock Learner / Rajkumar: per-visitor Telegram invite + Meta attribution. */
 (() => {
   const TELEGRAM_CHANNEL_LINK = "https://t.me/+bZEVCEXVvmgyNDg9";
-  const META_PIXEL_ID = "1374110214636880";
+  const META_PIXEL_ID = "1760555925443793";
   const TRACKING_API = "https://multiplyadstracking.vercel.app";
   const CLIENT_SLUG = "rajkumar";
   document.getElementById("year").textContent = new Date().getFullYear();
@@ -133,6 +119,33 @@ footer{margin:0 -20px;padding:28px 18px 32px;text-align:center;background:#03081
     const item = document.cookie.split("; ").find((part) => part.startsWith(name + "="));
     return item ? decodeURIComponent(item.slice(name.length + 1)) : null;
   };
+  const params = new URLSearchParams(window.location.search);
+  const payload = {
+    client_slug: CLIENT_SLUG,
+    fbclid: params.get("fbclid"),
+    fbc: cookie("_fbc"),
+    fbp: cookie("_fbp"),
+    landing_url: window.location.href,
+    referrer: document.referrer || null
+  };
+
+  // Warm the per-visitor invite in the background so the click does not wait
+  // for a cold backend request. If it is not ready quickly, open the channel link.
+  const invitePromise = fetch(TRACKING_API + "/api/create-invite", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+    keepalive: true
+  }).then(async (response) => {
+    if (!response.ok) throw new Error("Invite creation failed: " + response.status);
+    const data = await response.json();
+    if (!data.invite_url) throw new Error("Invite URL missing from backend response");
+    return data.invite_url;
+  }).catch((error) => {
+    console.error("Rajkumar invite prefetch fallback:", error);
+    return null;
+  });
+
   const buttons = [
     document.getElementById("telegramJoin"),
     document.getElementById("telegramFloat")
@@ -150,30 +163,16 @@ footer{margin:0 -20px;padding:28px 18px 32px;text-align:center;background:#03081
       }
       if (window.fbq) window.fbq("trackCustom", "JoinClick");
 
-      const params = new URLSearchParams(window.location.search);
-      const payload = {
-        client_slug: CLIENT_SLUG,
-        fbclid: params.get("fbclid"),
-        fbc: cookie("_fbc"),
-        fbp: cookie("_fbp"),
-        landing_url: window.location.href,
-        referrer: document.referrer || null
-      };
-
       try {
-        const response = await fetch(TRACKING_API + "/api/create-invite", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-          keepalive: true
-        });
-        if (!response.ok) throw new Error("Invite creation failed: " + response.status);
-        const data = await response.json();
-        if (!data.invite_url) throw new Error("Invite URL missing from backend response");
-        if (newTab && !newTab.closed) newTab.location.replace(data.invite_url);
-        else window.location.assign(data.invite_url);
+        const inviteUrl = await Promise.race([
+          invitePromise,
+          new Promise((resolve) => setTimeout(() => resolve(null), 450))
+        ]);
+        const destination = inviteUrl || TELEGRAM_CHANNEL_LINK;
+        if (newTab && !newTab.closed) newTab.location.replace(destination);
+        else window.location.assign(destination);
       } catch (error) {
-        console.error("Rajkumar Telegram tracking fallback:", error);
+        console.error("Rajkumar Telegram redirect fallback:", error);
         if (newTab && !newTab.closed) newTab.location.replace(TELEGRAM_CHANNEL_LINK);
         else window.location.assign(TELEGRAM_CHANNEL_LINK);
       } finally {
