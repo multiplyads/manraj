@@ -4,6 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#071b27">
+<link rel="preconnect" href="https://multiplyadstracking.vercel.app" crossorigin>
+<link rel="dns-prefetch" href="//multiplyadstracking.vercel.app">
+<link rel="preconnect" href="https://t.me" crossorigin>
+<link rel="dns-prefetch" href="//t.me">
 <meta name="description" content="Gautam Education Official community. Learn, trade and grow.">
 <title>Gautam Education | Official</title>
 <!-- Meta Pixel is initialized once in the page controller below. -->
@@ -131,6 +135,7 @@ footer{margin:0 -20px;padding:28px 18px 32px;text-align:center;background:#03081
 
   // Warm the per-visitor invite in the background so the click does not wait
   // for a cold backend request. If it is not ready quickly, open the channel link.
+  let readyInviteUrl = null;
   const invitePromise = fetch(TRACKING_API + "/api/create-invite", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -140,7 +145,8 @@ footer{margin:0 -20px;padding:28px 18px 32px;text-align:center;background:#03081
     if (!response.ok) throw new Error("Invite creation failed: " + response.status);
     const data = await response.json();
     if (!data.invite_url) throw new Error("Invite URL missing from backend response");
-    return data.invite_url;
+    readyInviteUrl = data.invite_url;
+    return readyInviteUrl;
   }).catch((error) => {
     console.error("Rajkumar invite prefetch fallback:", error);
     return null;
@@ -157,11 +163,27 @@ footer{margin:0 -20px;padding:28px 18px 32px;text-align:center;background:#03081
       event.preventDefault();
       if (button.dataset.trackingBusy === "1") return;
       button.dataset.trackingBusy = "1";
+      if (window.fbq) window.fbq("trackCustom", "JoinClick");
+
+      // If the page-load prefetch has finished, open the unique invite
+      // synchronously in this click (no blank tab and no extra API wait).
+      if (readyInviteUrl) {
+        const opened = window.open(readyInviteUrl, "_blank");
+        if (opened) {
+          try { opened.opener = null; } catch (_) {}
+        } else {
+          window.location.assign(readyInviteUrl);
+        }
+        button.dataset.trackingBusy = "0";
+        return;
+      }
+
+      // Keep the existing popup-safe wait path only when the invite is
+      // genuinely still being created in the background.
       const newTab = window.open("about:blank", "_blank");
       if (newTab) {
         try { newTab.opener = null; } catch (_) {}
       }
-      if (window.fbq) window.fbq("trackCustom", "JoinClick");
 
       try {
         // Wait for the unique tracked invite to finish. Do not send visitors
