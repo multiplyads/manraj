@@ -164,10 +164,11 @@ footer{margin:0 -20px;padding:28px 18px 32px;text-align:center;background:#03081
       if (window.fbq) window.fbq("trackCustom", "JoinClick");
 
       try {
-        const inviteUrl = await Promise.race([
-          invitePromise,
-          new Promise((resolve) => setTimeout(() => resolve(null), 450))
-        ]);
+        // Wait for the unique tracked invite to finish. Do not send visitors
+        // to the shared channel link merely because the backend took >450ms.
+        // If invite creation actually fails, the catch below preserves the
+        // existing direct-channel fallback so joining remains available.
+        const inviteUrl = await invitePromise;
         const destination = inviteUrl || TELEGRAM_CHANNEL_LINK;
         if (newTab && !newTab.closed) newTab.location.replace(destination);
         else window.location.assign(destination);
